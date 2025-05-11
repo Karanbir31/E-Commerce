@@ -4,7 +4,7 @@ import com.example.ecommerce.productslist.domain.modules.Product
 
 interface ProductsListRepository {
 
-    suspend fun getProducts(
+    suspend fun getAllProducts(
         pageNumber: Int = 1,
         sortBy: String = "title",
         sortingOrder: String = "asc"
