@@ -14,7 +14,7 @@ interface ProductsApi {
         @Query("limit") limit : Int,
         @Query("skip") skip : Int,
         @Query("sortBy") sortBy : String,
-        @Query("order") sortingOrder : Int
+        @Query("order") sortingOrder : String
     ) : Response<List<Product>>
 
     @GET("products/search")
@@ -23,7 +23,7 @@ interface ProductsApi {
         @Query("limit") limit : Int,
         @Query("skip") skip : Int,
         @Query("sortBy") sortBy : String,
-        @Query("order") sortingOrder : Int
+        @Query("order") sortingOrder : String
     ): Response<List<Product>>
 
     @GET("products/category-list")
@@ -35,7 +35,7 @@ interface ProductsApi {
         @Query("limit") limit : Int,
         @Query("skip") skip : Int,
         @Query("sortBy") sortBy : String,
-        @Query("order") sortingOrder : Int
+        @Query("order") sortingOrder : String
     ): Response<List<Product>>
 
 
