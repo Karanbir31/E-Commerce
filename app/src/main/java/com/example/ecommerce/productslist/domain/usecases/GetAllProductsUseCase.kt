@@ -4,7 +4,7 @@ import com.example.ecommerce.productslist.domain.ProductsListRepository
 import com.example.ecommerce.productslist.domain.modules.Product
 import javax.inject.Inject
 
-class GetAllProducts @Inject constructor(
+class GetAllProductsUseCase @Inject constructor(
     private val repository: ProductsListRepository
 ) {
     suspend operator fun invoke(
