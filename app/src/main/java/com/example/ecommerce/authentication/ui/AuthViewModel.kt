@@ -13,6 +13,7 @@ import com.example.ecommerce.authentication.domain.usecases.GetSavedRefreshToken
 import com.example.ecommerce.authentication.domain.usecases.GetUserDataUseCase
 import com.example.ecommerce.authentication.domain.usecases.LoginUseCase
 import com.example.ecommerce.authentication.domain.usecases.RefreshTokenUseCase
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@HiltViewModel
 class AuthViewModel @Inject constructor(
     private val login: LoginUseCase,
     private val refreshToken: RefreshTokenUseCase,

@@ -58,5 +58,4 @@ object AuthenticationModule {
         return GetSavedRefreshTokenUseCase(repository)
     }
 
-
 }
