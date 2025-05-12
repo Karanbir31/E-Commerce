@@ -26,5 +26,9 @@ interface ProductsListRepository {
         sortingOrder: String = "asc"
     ): List<Product>
 
+    suspend fun getProductDetails(
+        productId: Long
+    ) : Product
+
 
 }

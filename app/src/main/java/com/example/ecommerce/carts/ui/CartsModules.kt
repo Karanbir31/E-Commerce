@@ -40,6 +40,4 @@ object CartsModules {
     ): GetUsersCartUseCase {
         return GetUsersCartUseCase(repository)
     }
-
-
 }

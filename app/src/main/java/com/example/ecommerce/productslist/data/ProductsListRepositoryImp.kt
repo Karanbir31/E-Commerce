@@ -84,5 +84,19 @@ class ProductsListRepositoryImp @Inject constructor(
 
     }
 
+    override suspend fun getProductDetails(productId: Long): Product {
+        val response = productsApi.getProductDetails(productId)
+        if (response.isSuccessful){
+
+            response.body()?.let { body->
+                return body
+            } ?: throw Exception("response body is null")
+
+        }else{
+            throw Exception("retrofit response is unsuccessful\n ErrorCode : ${response.code()} and ErrorMessage : ${response.message()}")
+        }
+
+    }
+
 
 }

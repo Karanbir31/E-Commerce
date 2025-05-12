@@ -39,4 +39,9 @@ interface ProductsApi {
     ): Response<List<Product>>
 
 
+    @GET("products/{productId}")
+    suspend fun getProductDetails(
+       @Path("productId") productId: Long
+    ) : Response<Product>
+
 }

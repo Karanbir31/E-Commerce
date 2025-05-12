@@ -4,6 +4,7 @@ import com.example.ecommerce.productslist.data.ProductsApi
 import com.example.ecommerce.productslist.data.ProductsListRepositoryImp
 import com.example.ecommerce.productslist.domain.ProductsListRepository
 import com.example.ecommerce.productslist.domain.usecases.GetAllProductsUseCase
+import com.example.ecommerce.productslist.domain.usecases.GetProductDetailsUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetProductsByCategoriesUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetProductsCategoriesUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetSearchedProductsUseCase
@@ -24,20 +25,19 @@ abstract class ProductsListRepositoryBinder {
     ): ProductsListRepository
 }
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 object ProductsListModule {
 
     @Provides
     @Singleton
-    fun providesProductsApi(retrofit: Retrofit): ProductsApi {
+    fun provideProductsApi(retrofit: Retrofit): ProductsApi {
         return retrofit.create(ProductsApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun providesGetAllProductsUseCase(
+    fun provideGetAllProductsUseCase(
         repository: ProductsListRepository
     ): GetAllProductsUseCase {
         return GetAllProductsUseCase(repository)
@@ -45,7 +45,7 @@ object ProductsListModule {
 
     @Provides
     @Singleton
-    fun providesGetProductsByCategoriesUseCase(
+    fun provideGetProductsByCategoriesUseCase(
         repository: ProductsListRepository
     ): GetProductsByCategoriesUseCase {
         return GetProductsByCategoriesUseCase(repository)
@@ -53,7 +53,7 @@ object ProductsListModule {
 
     @Provides
     @Singleton
-    fun providesGetProductsCategoriesUseCase(
+    fun provideGetProductsCategoriesUseCase(
         repository: ProductsListRepository
     ): GetProductsCategoriesUseCase {
         return GetProductsCategoriesUseCase(repository)
@@ -61,10 +61,16 @@ object ProductsListModule {
 
     @Provides
     @Singleton
-    fun providesGetSearchedProductsUseCase(
+    fun provideGetSearchedProductsUseCase(
         repository: ProductsListRepository
     ): GetSearchedProductsUseCase {
         return GetSearchedProductsUseCase(repository)
+    }
+
+    fun provideGetProductDetailsUseCase(
+        repository: ProductsListRepository
+    ) : GetProductDetailsUseCase{
+        return GetProductDetailsUseCase(repository)
     }
 
 
