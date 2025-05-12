@@ -1,12 +1,8 @@
 package com.example.ecommerce.userDetails.ui
 
-import android.app.AuthenticationRequiredException
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ecommerce.authentication.domain.modules.LoginResponse
-import com.example.ecommerce.authentication.domain.usecases.GetSavedRefreshTokenUseCase
-import com.example.ecommerce.authentication.domain.usecases.GetUserDataUseCase
 import com.example.ecommerce.userDetails.domain.modules.UserDetails
 import com.example.ecommerce.userDetails.domain.usecases.GetUserAccessTokenUseCase
 import com.example.ecommerce.userDetails.domain.usecases.GetUserDetailsUseCase
