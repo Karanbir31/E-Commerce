@@ -16,6 +16,7 @@ import retrofit2.Retrofit
 import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 abstract class ProductsListRepositoryBinder {
     @Binds
     abstract fun bindRepositoryWithImp(
@@ -26,7 +27,7 @@ abstract class ProductsListRepositoryBinder {
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface ProductsListModule {
+object ProductsListModule {
 
     @Provides
     @Singleton

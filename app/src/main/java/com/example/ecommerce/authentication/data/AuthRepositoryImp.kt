@@ -17,60 +17,56 @@ class AuthRepositoryImp @Inject constructor(
     private val authApi: AuthApi,
     private val sharedPref: SharedPreferences,
     @ApplicationContext private val context: Context
-
 ) : AuthRepository {
 
     private final val TAG = "AuthRepositoryImp"
 
     override suspend fun login(loginRequest: LoginRequest): LoginResponse {
-        try {
-            val response = authApi.login(loginRequest)
-            if (response.isSuccessful && response.body() != null) {
+        val response = authApi.login(loginRequest)
+        if (response.isSuccessful) {
 
-                saveRefreshToken(response.body()!!.refreshToken)
+            response.body()?.let {body->
+                saveRefreshToken(body.refreshToken)
+                return body
+            } ?: throw Exception("Login User response is null")
 
-                return response.body()!!
-            } else {
-                throw Exception("Login Failed")
-            }
-        } catch (e: Exception) {
-            throw Exception("Login Failed", e)
+        } else {
+            throw Exception("Login Failed Error \n Code : ${response.code()} ErrorMessage : ${response.message()}")
         }
+
     }
 
     override suspend fun refreshToken(refreshTokenRequest: RefreshTokenRequest): RefreshTokenResponse {
-        try {
-            val response = authApi.refreshToken(refreshTokenRequest)
-            if (response.isSuccessful && response.body() != null) {
+        val response = authApi.refreshToken(refreshTokenRequest)
+        if (response.isSuccessful) {
 
-                saveRefreshToken(response.body()!!.refreshToken)
+            response.body()?.let {body->
+                saveRefreshToken(body.refreshToken)
+                return body
+            } ?: throw Exception("Response body is null for refreshToken fun")
 
-                return response.body()!!
-            } else {
-                throw Exception("refresh token Failed")
-            }
-        } catch (e: Exception) {
-            throw Exception("refresh token Failed", e)
+        } else {
+            throw Exception("refresh token Failed \n ErrorCode : ${response.code()} ErrorMessage : ${response.message()}")
         }
     }
 
     override suspend fun getUserData(accessToken: String): LoginResponse {
-        try {
-            val response = authApi.getUserData(accessToken)
-            if (response.isSuccessful && response.body() != null) {
-                return response.body()!!
-            } else {
-                throw Exception("fail to read user data")
-            }
-        } catch (e: Exception) {
-            throw Exception("fail to read user data", e)
+        val response = authApi.getUserData(accessToken)
+        if (response.isSuccessful) {
+
+            response.body()?.let {body->
+                return body
+            } ?: throw Exception("Response body is null for getUserData")
+
+        } else {
+            throw Exception("fail to read user data\n ErrorCode : ${response.code()} ErrorMessage : ${response.message()}")
         }
     }
 
     override suspend fun getSavedRefreshToken(): String? {
         try {
-           return sharedPref.getString(context.getString(R.string.refresh_token), null)
-        }catch (e: Exception){
+            return sharedPref.getString(context.getString(R.string.refresh_token), null)
+        } catch (e: Exception) {
             Log.e(TAG, "failed to read token from shared perf", e)
             return null
         }
@@ -83,9 +79,8 @@ class AuthRepositoryImp @Inject constructor(
                 putString(context.getString(R.string.refresh_token), token)
             }
         } catch (e: Exception) {
-
+            Log.e(TAG, "failed to save token into shared perf", e)
         }
     }
-
 
 }
