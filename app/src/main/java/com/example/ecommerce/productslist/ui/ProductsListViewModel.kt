@@ -82,7 +82,4 @@ class ProductsListViewModel @Inject constructor(
         }
     }
 
-
-
-
 }
