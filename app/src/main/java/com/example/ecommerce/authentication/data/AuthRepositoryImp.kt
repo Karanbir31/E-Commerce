@@ -12,6 +12,7 @@ import com.example.ecommerce.authentication.domain.modules.RefreshTokenResponse
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import androidx.core.content.edit
+import com.example.ecommerce.helperUtils.SharedPrefKeys
 
 class AuthRepositoryImp @Inject constructor(
     private val authApi: AuthApi,
@@ -65,7 +66,7 @@ class AuthRepositoryImp @Inject constructor(
 
     override suspend fun getSavedRefreshToken(): String? {
         try {
-            return sharedPref.getString(context.getString(R.string.refresh_token), null)
+            return sharedPref.getString(SharedPrefKeys.REFRESH_TOKEN, null)
         } catch (e: Exception) {
             Log.e(TAG, "failed to read token from shared perf", e)
             return null
@@ -76,7 +77,7 @@ class AuthRepositoryImp @Inject constructor(
     private fun saveRefreshToken(token: String) {
         try {
             sharedPref.edit {
-                putString(context.getString(R.string.refresh_token), token)
+                putString(SharedPrefKeys.REFRESH_TOKEN, token)
             }
         } catch (e: Exception) {
             Log.e(TAG, "failed to save token into shared perf", e)
