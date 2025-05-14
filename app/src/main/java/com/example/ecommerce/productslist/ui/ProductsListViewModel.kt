@@ -8,12 +8,20 @@ import com.example.ecommerce.productslist.domain.usecases.GetAllProductsUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetProductsByCategoriesUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetProductsCategoriesUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetSearchedProductsUseCase
+import com.example.ecommerce.productslist.ui.ProductsUiState.Success
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class ProductsUiState() {
+    object Loading : ProductsUiState()
+    class Error(exception: Exception) : ProductsUiState()
+    class Success(data: List<Product>) : ProductsUiState()
+}
+
 
 @HiltViewModel
 class ProductsListViewModel @Inject constructor(
@@ -27,8 +35,8 @@ class ProductsListViewModel @Inject constructor(
     private val _productCategories = MutableStateFlow<List<String>>(emptyList())
     val productCategories: StateFlow<List<String>> get() = _productCategories
 
-    private val _products = MutableStateFlow<List<Product>>(emptyList())
-    val products: StateFlow<List<Product>> get() = _products
+    private val _products = MutableStateFlow<ProductsUiState>(ProductsUiState.Loading)
+    val products: StateFlow<ProductsUiState> get() = _products
 
     init {
         getAllProducts(pageNumber = 1)
@@ -49,9 +57,10 @@ class ProductsListViewModel @Inject constructor(
     fun getAllProducts(pageNumber: Int = 1) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _products.value = getAllProductsUseCase(pageNumber)
+                val data = getAllProductsUseCase(pageNumber)
+                _products.value = ProductsUiState.Success(data)
             } catch (e: Exception) {
-                Log.e(TAG, e.message, e)
+                _products.value = ProductsUiState.Error(e)
             }
         }
     }
@@ -59,12 +68,14 @@ class ProductsListViewModel @Inject constructor(
     fun searchProducts(searchQuery: String, pageNumber: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _products.value = getSearchedProductsUseCase.invoke(
+               val data = getSearchedProductsUseCase.invoke(
                     searchQuery = searchQuery,
                     pageNumber = pageNumber
                 )
+
+                _products.value = ProductsUiState.Success(data)
             } catch (e: Exception) {
-                Log.e(TAG, e.message, e)
+                _products.value = ProductsUiState.Error(e)
             }
         }
     }
@@ -72,12 +83,13 @@ class ProductsListViewModel @Inject constructor(
     fun searchProductsByCategory(category: String, pageNumber: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _products.value = getProductsByCategoriesUseCase.invoke(
+                val data = getProductsByCategoriesUseCase.invoke(
                     category = category,
                     pageNumber = pageNumber
                 )
+                _products.value = ProductsUiState.Success(data)
             } catch (e: Exception) {
-                Log.e(TAG, e.message, e)
+                _products.value = ProductsUiState.Error(e)
             }
         }
     }
