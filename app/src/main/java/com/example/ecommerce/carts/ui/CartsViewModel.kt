@@ -13,6 +13,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
+sealed class CartsUiState {
+    object Loading : CartsUiState()
+    class Error(exception: Exception) : CartsUiState()
+    class Success(data: Cart) : CartsUiState()
+}
+
 @HiltViewModel
 class CartsViewModel @Inject constructor(
     private val getUsersCartUseCase: GetUsersCartUseCase
@@ -20,15 +26,15 @@ class CartsViewModel @Inject constructor(
 
     private val TAG = "CartsViewModel"
 
-    private val _usersCart = MutableStateFlow<Cart>(Cart())
-    val usersCart: StateFlow<Cart> get() = _usersCart
+    private val _usersCart = MutableStateFlow<CartsUiState>(CartsUiState.Loading)
+    val usersCart: StateFlow<CartsUiState> get() = _usersCart
 
     fun getUsersCart(userId: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-               _usersCart.value = getUsersCartUseCase(userId)
+                _usersCart.value = CartsUiState.Success(getUsersCartUseCase(userId))
             } catch (e: Exception) {
-                Log.e(TAG, e.message, e)
+                _usersCart.value = CartsUiState.Error(exception = e)
             }
         }
     }

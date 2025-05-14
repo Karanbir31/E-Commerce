@@ -13,6 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+sealed class UserDetailsUiState {
+    object Loading : UserDetailsUiState()
+    class Error(exception: Exception) : UserDetailsUiState()
+    class Success(data: UserDetails) : UserDetailsUiState()
+}
+
 @HiltViewModel
 class UserDetailsViewModel @Inject constructor(
     private val getUserDetailsUseCase: GetUserDetailsUseCase,
@@ -20,15 +26,15 @@ class UserDetailsViewModel @Inject constructor(
 ) : ViewModel() {
     private val TAG = "UserDetailsViewModel"
 
-    private val _userDetails = MutableStateFlow<UserDetails>(UserDetails())
-    val userDetails: StateFlow<UserDetails> get() = _userDetails
+    private val _userDetails = MutableStateFlow<UserDetailsUiState>(UserDetailsUiState.Loading)
+    val userDetails: StateFlow<UserDetailsUiState> get() = _userDetails
 
     private fun getUserDetails(refreshToken: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                _userDetails.value = getUserDetailsUseCase(refreshToken)
+                _userDetails.value = UserDetailsUiState.Success(getUserDetailsUseCase(refreshToken))
             } catch (e: Exception) {
-                Log.e(TAG, e.message, e)
+                _userDetails.value = UserDetailsUiState.Error(exception = e)
             }
         }
     }
