@@ -1,8 +1,8 @@
 package com.example.ecommerce.carts.domain.modules
 
 data class CartsResponse(
-    val carts: Cart,
-    val total: Int,
-    val skip: Int,
-    val limit: Int
+    val carts: Cart = Cart(),
+    val total: Int = 0,
+    val skip: Int = 0,
+    val limit: Int = 0
 )

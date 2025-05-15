@@ -1,5 +1,6 @@
 package com.example.ecommerce.carts.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -32,7 +33,7 @@ fun CartsDetailsScreen(cartsViewModel: CartsViewModel = hiltViewModel()) {
 
     when (val state = cartsUiState) {
         is CartsUiState.Error -> {
-
+            Log.e("tag", "error in carts ui state ${state.exception}")
         }
 
         CartsUiState.Loading -> {
@@ -40,7 +41,7 @@ fun CartsDetailsScreen(cartsViewModel: CartsViewModel = hiltViewModel()) {
         }
 
         is CartsUiState.Success -> {
-            UserCartsDetailsUi(state.data.carts)
+            UserCartsDetailsUi(state.data)
         }
     }
 }

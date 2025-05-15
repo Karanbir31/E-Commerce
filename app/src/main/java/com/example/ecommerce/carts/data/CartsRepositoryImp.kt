@@ -3,8 +3,6 @@ package com.example.ecommerce.carts.data
 import android.content.SharedPreferences
 import com.example.ecommerce.carts.domain.CartsRepository
 import com.example.ecommerce.carts.domain.modules.Cart
-import com.example.ecommerce.carts.domain.modules.CartsResponse
-import com.example.ecommerce.helperUtils.SharedPrefKeys
 import javax.inject.Inject
 
 class CartsRepositoryImp @Inject constructor(
@@ -12,15 +10,15 @@ class CartsRepositoryImp @Inject constructor(
     private val sharedPref: SharedPreferences
 ) : CartsRepository {
 
-    override suspend fun getUsersCart(): CartsResponse {
-
-        val userAccessToken = sharedPref.getString(SharedPrefKeys.ACCESS_TOKEN, null)
-
-        if (userAccessToken == null){
-            throw Exception("Unknown user, login first")
+    override suspend fun getUsersCart(): Cart {
+        var userAccessToken : String? = "5"
+        try {
+             //userAccessToken = sharedPref.getString(SharedPrefKeys.ACCESS_TOKEN, null)
+        }catch (e: Exception){
+            userAccessToken = "5"
         }
 
-        val response = cartsApi.getUsersCarts(userAccessToken.toLong())
+        val response = cartsApi.getUsersCarts(userAccessToken!!.toLong())
         if (response.isSuccessful) {
             val body = response.body()
             return body ?: throw Exception("Response body is null")

@@ -12,8 +12,12 @@ import com.example.ecommerce.productslist.ui.productsDetails.ProductDetailsScree
 import com.example.ecommerce.userDetails.ui.UserDetailsScreen
 
 @Composable
-fun AppNavigationGraph(navController: NavHostController,modifier: Modifier = Modifier) {
-    NavHost(navController, startDestination = NavScreens.Products.route ){
+fun AppNavigationGraph(navController: NavHostController, modifier: Modifier = Modifier) {
+    NavHost(
+        navController = navController,
+        startDestination = NavScreens.Products.route,
+        modifier = modifier
+    ) {
 
         composable(NavScreens.Products.route) {
             ProductsScreen(navController = navController)
@@ -25,7 +29,7 @@ fun AppNavigationGraph(navController: NavHostController,modifier: Modifier = Mod
             CartsDetailsScreen()
         }
         composable(NavScreens.Authentication.route) {
-            AuthenticationScreen(navController= navController)
+            AuthenticationScreen(navController = navController)
         }
         composable(NavScreens.ProductDetails.route) {
             ProductDetailsScreen()

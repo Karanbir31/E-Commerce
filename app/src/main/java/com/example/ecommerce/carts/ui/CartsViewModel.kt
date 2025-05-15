@@ -3,6 +3,7 @@ package com.example.ecommerce.carts.ui
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.ecommerce.carts.domain.modules.Cart
 import com.example.ecommerce.carts.domain.modules.CartsResponse
 import com.example.ecommerce.carts.domain.usecases.GetUsersCartUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,7 @@ import javax.inject.Inject
 sealed class CartsUiState {
     object Loading : CartsUiState()
     class Error(val exception: Exception) : CartsUiState()
-    class Success(val data: CartsResponse) : CartsUiState()
+    class Success(val data: Cart) : CartsUiState()
 }
 
 @HiltViewModel
