@@ -1,6 +1,7 @@
 package com.example.ecommerce.productslist.domain
 
 import com.example.ecommerce.productslist.domain.modules.Product
+import com.example.ecommerce.productslist.domain.modules.ProductsResponse
 
 interface ProductsListRepository {
 
@@ -8,14 +9,14 @@ interface ProductsListRepository {
         pageNumber: Int = 1,
         sortBy: String = "title",
         sortingOrder: String = "asc"
-    ): List<Product>
+    ): ProductsResponse
 
     suspend fun getSearchedProducts(
         searchQuery: String,
         pageNumber: Int = 1,
         sortBy: String = "title",
         sortingOrder: String = "asc"
-    ): List<Product>
+    ): ProductsResponse
 
     suspend fun getProductsCategories(): List<String>
 
@@ -24,7 +25,7 @@ interface ProductsListRepository {
         pageNumber: Int = 1,
         sortBy: String = "title",
         sortingOrder: String = "asc"
-    ): List<Product>
+    ): ProductsResponse
 
     suspend fun getProductDetails(
         productId: Long

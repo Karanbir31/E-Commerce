@@ -3,6 +3,7 @@ package com.example.ecommerce.productslist.data
 import android.util.Log
 import com.example.ecommerce.productslist.domain.ProductsListRepository
 import com.example.ecommerce.productslist.domain.modules.Product
+import com.example.ecommerce.productslist.domain.modules.ProductsResponse
 import javax.inject.Inject
 
 class ProductsListRepositoryImp @Inject constructor(
@@ -15,15 +16,18 @@ class ProductsListRepositoryImp @Inject constructor(
         pageNumber: Int,
         sortBy: String,
         sortingOrder: String
-    ): List<Product> {
+    ): ProductsResponse {
+
         val response = productsApi.getAllProducts(
             limit = 15,
             skip = (pageNumber - 1) * 15,
             sortBy = sortBy,
             sortingOrder = sortingOrder
         )
+
+
         if (response.isSuccessful) {
-            return response.body() ?: emptyList()
+            return response.body() ?: throw Exception("response body is null")
         } else {
             throw Exception("retrofit response is unsuccessful \n ErrorCode : ${response.code()} and ErrorMessage : ${response.message()}")
         }
@@ -34,7 +38,7 @@ class ProductsListRepositoryImp @Inject constructor(
         pageNumber: Int,
         sortBy: String,
         sortingOrder: String
-    ): List<Product> {
+    ): ProductsResponse {
         val response = productsApi.getSearchedProducts(
             searchQuery = searchQuery,
             limit = 15,
@@ -44,7 +48,7 @@ class ProductsListRepositoryImp @Inject constructor(
         )
 
         if (response.isSuccessful) {
-            return response.body() ?: emptyList()
+            return response.body() ?: throw Exception("response body is null")
         } else {
             throw Exception("retrofit response is unsuccessful\n ErrorCode : ${response.code()} and ErrorMessage : ${response.message()}")
         }
@@ -68,7 +72,7 @@ class ProductsListRepositoryImp @Inject constructor(
         pageNumber: Int,
         sortBy: String,
         sortingOrder: String
-    ): List<Product> {
+    ): ProductsResponse {
         val response = productsApi.getProductsByCategories(
             category = category,
             limit = 15,
@@ -77,7 +81,7 @@ class ProductsListRepositoryImp @Inject constructor(
             sortingOrder = sortingOrder
         )
         if (response.isSuccessful) {
-            return response.body() ?: emptyList()
+            return response.body() ?: throw Exception("response body is null")
         } else {
             throw Exception("retrofit response is unsuccessful\n ErrorCode : ${response.code()} and ErrorMessage : ${response.message()}")
         }
@@ -86,13 +90,13 @@ class ProductsListRepositoryImp @Inject constructor(
 
     override suspend fun getProductDetails(productId: Long): Product {
         val response = productsApi.getProductDetails(productId)
-        if (response.isSuccessful){
+        if (response.isSuccessful) {
 
-            response.body()?.let { body->
+            response.body()?.let { body ->
                 return body
             } ?: throw Exception("response body is null")
 
-        }else{
+        } else {
             throw Exception("retrofit response is unsuccessful\n ErrorCode : ${response.code()} and ErrorMessage : ${response.message()}")
         }
 

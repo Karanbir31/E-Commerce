@@ -1,12 +1,16 @@
 package com.example.ecommerce.productslist.ui
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import com.example.ecommerce.R
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -29,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,12 +57,20 @@ fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel(
 
         val trimmedQuery = searchedQuery.trim()
         when {
-            trimmedQuery.isEmpty() -> productsListViewModel.getAllProducts()
+            trimmedQuery.isEmpty() -> {
+                Log.d("tag", "call getAllProducts function")
+                productsListViewModel.getAllProducts()
+            }
 
-            productsCategories.any { it.equals(trimmedQuery, ignoreCase = true) } ->
+            productsCategories.any { it.equals(trimmedQuery, ignoreCase = true) } -> {
+                Log.d("tag", "call searchProductsByCategory function with $trimmedQuery")
                 productsListViewModel.searchProductsByCategory(trimmedQuery, 1)
+            }
 
-            else -> productsListViewModel.searchProducts(searchQuery = trimmedQuery)
+            else -> {
+                Log.d("tag", "call searchProducts function with $trimmedQuery")
+                productsListViewModel.searchProducts(searchQuery = trimmedQuery)
+            }
         }
     }
 
@@ -87,8 +100,9 @@ fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel(
 
                         )
                     },
-                    modifier = Modifier.fillMaxWidth()
-                        .shadow(elevation = 8.dp )
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(elevation = 8.dp)
                 )
             }else{
                 ProductsSearchBar(
@@ -112,15 +126,19 @@ fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel(
     ) { innerPadding ->
         when (val state =productsUiState) {
             is ProductsUiState.Error -> {
-
+                Log.d("tag", "Ui state is error and errorCode - ${state.exception}")
             }
 
             ProductsUiState.Loading -> {
-
+                Log.d("tag", "Ui state is loading")
             }
 
             is ProductsUiState.Success -> {
-                ProductsList(products = state.data, modifier = Modifier.fillMaxSize().padding(innerPadding))
+                Log.d("tag", "Ui state is Success")
+                Log.d("tag", "data is ${state.data}")
+                ProductsList(products = state.data.products, modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding))
             }
         }
     }
@@ -128,14 +146,19 @@ fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel(
 
 @Composable
 fun ProductsList(products: List<Product>, modifier: Modifier = Modifier) {
-    LazyColumn{
+    val context = LocalContext.current
+    LazyColumn(modifier = modifier){
         items(products) { product ->
             ProductPreviewCard(
                 product = product,
                 onClickProduct = {
-
+                    Toast.makeText(context, "you click ${product.title}", Toast.LENGTH_SHORT).show()
                 }
             )
+        }
+
+        item{
+            Spacer(modifier.height(200.dp))
         }
     }
 }
@@ -143,12 +166,13 @@ fun ProductsList(products: List<Product>, modifier: Modifier = Modifier) {
 
 @Composable
 fun ProductPreviewCard(product: Product, onClickProduct: () -> Unit) {
-
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
+            .clickable(
+                onClick = { onClickProduct.invoke() }
+            )
             .border(
                 width = 2.dp,
                 color = MaterialTheme.colorScheme.primary,

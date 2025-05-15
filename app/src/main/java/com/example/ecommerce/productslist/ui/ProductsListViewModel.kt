@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ecommerce.productslist.domain.modules.Product
+import com.example.ecommerce.productslist.domain.modules.ProductsResponse
 import com.example.ecommerce.productslist.domain.usecases.GetAllProductsUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetProductsByCategoriesUseCase
 import com.example.ecommerce.productslist.domain.usecases.GetProductsCategoriesUseCase
@@ -18,7 +19,7 @@ import javax.inject.Inject
 sealed class ProductsUiState() {
     object Loading : ProductsUiState()
     class Error(val exception: Exception) : ProductsUiState()
-    class Success(val data: List<Product>) : ProductsUiState()
+    class Success(val data: ProductsResponse) : ProductsUiState()
 }
 
 
@@ -72,7 +73,6 @@ class ProductsListViewModel @Inject constructor(
                     searchQuery = searchQuery,
                     pageNumber = pageNumber
                 )
-
                 _productsUiState.value = ProductsUiState.Success(data)
             } catch (e: Exception) {
                 _productsUiState.value = ProductsUiState.Error(e)
