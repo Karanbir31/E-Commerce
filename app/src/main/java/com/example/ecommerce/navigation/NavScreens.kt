@@ -5,5 +5,7 @@ sealed class NavScreens(val route: String) {
     object UserDetails : NavScreens("user_details_screen")
     object Cart : NavScreens("cart_screen")
     object Authentication : NavScreens("authentication_screen")
-    object ProductDetails : NavScreens("product_details_screen")
+    object ProductDetails : NavScreens("product_details_screen/{productId}") {
+        fun createRoute(productId: Long): String = "product_details_screen/$productId"
+    }
 }

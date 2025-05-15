@@ -37,14 +37,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.ecommerce.navigation.NavScreens
 import com.example.ecommerce.productslist.domain.modules.Product
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel()) {
-
+fun ProductsScreen(
+    navController: NavController,
+    productsListViewModel: ProductsListViewModel = hiltViewModel()
+) {
     val productsCategories = productsListViewModel.productCategories.collectAsState().value
     val productsUiState = productsListViewModel.productsUiState.collectAsState().value
 
@@ -78,7 +82,7 @@ fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel(
         modifier = Modifier.fillMaxSize(),
 
         topBar = {
-            if (!isSearchBarActive){
+            if (!isSearchBarActive) {
                 TopAppBar(
                     title = {
                         Text(
@@ -104,7 +108,7 @@ fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel(
                         .fillMaxWidth()
                         .shadow(elevation = 8.dp)
                 )
-            }else{
+            } else {
                 ProductsSearchBar(
                     query = query,
                     onQueryChange = {
@@ -124,40 +128,47 @@ fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel(
         }
 
     ) { innerPadding ->
-        when (val state =productsUiState) {
+        when (val state = productsUiState) {
             is ProductsUiState.Error -> {
                 Log.d("tag", "Ui state is error and errorCode - ${state.exception}")
             }
-
             ProductsUiState.Loading -> {
                 Log.d("tag", "Ui state is loading")
             }
-
             is ProductsUiState.Success -> {
-                Log.d("tag", "Ui state is Success")
-                Log.d("tag", "data is ${state.data}")
-                ProductsList(products = state.data.products, modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding))
+                ProductsList(
+                    products = state.data.products,
+                    navController = navController,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                )
             }
         }
     }
 }
 
 @Composable
-fun ProductsList(products: List<Product>, modifier: Modifier = Modifier) {
+fun ProductsList(
+    products: List<Product>,
+    navController: NavController,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current
-    LazyColumn(modifier = modifier){
+    LazyColumn(modifier = modifier) {
         items(products) { product ->
             ProductPreviewCard(
                 product = product,
                 onClickProduct = {
                     Toast.makeText(context, "you click ${product.title}", Toast.LENGTH_SHORT).show()
+                    navController.navigate(
+                        NavScreens.ProductDetails.createRoute(productId = product.id)
+                    )
                 }
             )
         }
 
-        item{
+        item {
             Spacer(modifier.height(200.dp))
         }
     }

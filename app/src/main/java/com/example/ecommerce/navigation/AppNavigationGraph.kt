@@ -16,16 +16,16 @@ fun AppNavigationGraph(navController: NavHostController,modifier: Modifier = Mod
     NavHost(navController, startDestination = NavScreens.Products.route ){
 
         composable(NavScreens.Products.route) {
-            ProductsScreen()
+            ProductsScreen(navController = navController)
         }
         composable(NavScreens.UserDetails.route) {
-            UserDetailsScreen()
+            UserDetailsScreen(navController = navController)
         }
         composable(NavScreens.Cart.route) {
             CartsDetailsScreen()
         }
         composable(NavScreens.Authentication.route) {
-            AuthenticationScreen()
+            AuthenticationScreen(navController= navController)
         }
         composable(NavScreens.ProductDetails.route) {
             ProductDetailsScreen()
