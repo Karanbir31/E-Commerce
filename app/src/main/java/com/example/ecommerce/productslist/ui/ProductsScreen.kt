@@ -1,6 +1,7 @@
 package com.example.ecommerce.productslist.ui
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import com.example.ecommerce.R
 import androidx.compose.foundation.layout.Row
@@ -16,64 +17,122 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SearchBar
-import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.example.ecommerce.productslist.domain.modules.Product
-import retrofit2.http.Query
+import kotlinx.coroutines.delay
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductsScreen(productsListViewModel: ProductsListViewModel = hiltViewModel()) {
 
-    val productsUiState = productsListViewModel.products.collectAsState().value
+    val productsCategories = productsListViewModel.productCategories.collectAsState().value
+    val productsUiState = productsListViewModel.productsUiState.collectAsState().value
 
+    var isSearchBarActive by remember { mutableStateOf(false) }
+    var searchedQuery by remember { mutableStateOf("") }
+    var query by remember { mutableStateOf("") }
+
+    LaunchedEffect(searchedQuery) {
+        delay(200)
+
+        val trimmedQuery = searchedQuery.trim()
+        when {
+            trimmedQuery.isEmpty() -> productsListViewModel.getAllProducts()
+
+            productsCategories.any { it.equals(trimmedQuery, ignoreCase = true) } ->
+                productsListViewModel.searchProductsByCategory(trimmedQuery, 1)
+
+            else -> productsListViewModel.searchProducts(searchQuery = trimmedQuery)
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
 
         topBar = {
-            ProductsSearchBar()
+            if (!isSearchBarActive){
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = "Title",
+                            modifier = Modifier.padding(start = 16.dp)
+                        )
+                    },
+                    actions = {
+                        Icon(
+                            Icons.Default.Search,
+                            "search",
+                            modifier = Modifier
+                                .padding(start = 8.dp, end = 16.dp)
+                                .clickable(
+                                    onClick = {
+                                        isSearchBarActive = true
+                                    }
+                                )
+
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                        .shadow(elevation = 8.dp )
+                )
+            }else{
+                ProductsSearchBar(
+                    query = query,
+                    onQueryChange = {
+                        query = it
+                    },
+                    onSearchQuery = {
+                        searchedQuery = it
+                        isSearchBarActive = false
+                    },
+                    isActive = isSearchBarActive,
+                    onActiveChange = {
+                        isSearchBarActive = it
+                    },
+                    productsCategories = productsCategories
+                )
+            }
         }
+
     ) { innerPadding ->
+        when (val state =productsUiState) {
+            is ProductsUiState.Error -> {
 
-    }
+            }
 
-    when (productsUiState) {
-        is ProductsUiState.Error -> {
+            ProductsUiState.Loading -> {
 
-        }
+            }
 
-        ProductsUiState.Loading -> {
-
-        }
-
-        is ProductsUiState.Success -> {
-
+            is ProductsUiState.Success -> {
+                ProductsList(products = state.data, modifier = Modifier.fillMaxSize().padding(innerPadding))
+            }
         }
     }
-
-
-
-
 }
 
 @Composable
-fun ProductsList(products: List<Product>) {
+fun ProductsList(products: List<Product>, modifier: Modifier = Modifier) {
     LazyColumn{
         items(products) { product ->
             ProductPreviewCard(
                 product = product,
-                onCLickProduct = {
+                onClickProduct = {
 
                 }
             )
@@ -83,7 +142,7 @@ fun ProductsList(products: List<Product>) {
 
 
 @Composable
-fun ProductPreviewCard(product: Product, onCLickProduct: () -> Unit) {
+fun ProductPreviewCard(product: Product, onClickProduct: () -> Unit) {
 
 
     Row(
