@@ -8,8 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.ecommerce.navigation.AppNavigationGraph
+import com.example.ecommerce.navigation.BottomNavItems
 import com.example.ecommerce.navigation.BottomNavigationBar
 import com.example.ecommerce.ui.theme.ECommerceTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,13 +28,20 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController = rememberNavController()
+            val currentBackStackEntry by navController.currentBackStackEntryAsState()
+            val currentDestination = currentBackStackEntry?.destination
+
+            val showBottomBar = currentDestination?.route in BottomNavItems.bottomNavRoutes
+
+
             ECommerceTheme {
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-
                     bottomBar = {
-                        BottomNavigationBar(navController)
+                        if (showBottomBar){
+                            BottomNavigationBar(navController)
+                        }
                     }
 
                 ) { innerPadding ->

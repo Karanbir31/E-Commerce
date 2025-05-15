@@ -141,7 +141,7 @@ fun ProductsScreen(
                     navController = navController,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(innerPadding)
+                        .padding(top = innerPadding.calculateTopPadding())
                 )
             }
         }

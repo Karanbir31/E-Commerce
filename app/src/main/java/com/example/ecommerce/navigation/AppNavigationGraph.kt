@@ -3,8 +3,10 @@ package com.example.ecommerce.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.ecommerce.authentication.ui.AuthenticationScreen
 import com.example.ecommerce.carts.ui.CartsDetailsScreen
 import com.example.ecommerce.productslist.ui.ProductsScreen
@@ -31,8 +33,12 @@ fun AppNavigationGraph(navController: NavHostController, modifier: Modifier = Mo
         composable(NavScreens.Authentication.route) {
             AuthenticationScreen(navController = navController)
         }
-        composable(NavScreens.ProductDetails.route) {
-            ProductDetailsScreen()
+        composable(
+            NavScreens.ProductDetails.route,
+            arguments = listOf(navArgument("productId") { type = NavType.LongType })
+        ) {backStackEntry->
+            val productId = backStackEntry.arguments?.getLong("productId") ?: 1L
+            ProductDetailsScreen(productId = productId)
         }
     }
 }
