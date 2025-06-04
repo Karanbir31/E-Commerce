@@ -15,8 +15,8 @@ import javax.inject.Inject
 
 sealed class UserDetailsUiState {
     object Loading : UserDetailsUiState()
-    class Error(exception: Exception) : UserDetailsUiState()
-    class Success(data: UserDetails) : UserDetailsUiState()
+    class Error(val exception: Exception) : UserDetailsUiState()
+    class Success(val data: UserDetails) : UserDetailsUiState()
 }
 
 @HiltViewModel

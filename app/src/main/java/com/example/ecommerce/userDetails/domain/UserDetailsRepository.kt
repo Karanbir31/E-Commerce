@@ -8,4 +8,6 @@ interface UserDetailsRepository {
 
     suspend fun getUserAccessToken() : String
 
+    suspend fun saveAccessToken(accessToken: String)
+
 }
