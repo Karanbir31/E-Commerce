@@ -35,9 +35,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.ecommerce.authentication.domain.modules.LoginRequest
 import com.example.ecommerce.navigation.NavScreens
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import javax.annotation.meta.When
 
 @Composable
 fun AuthenticationScreen(
