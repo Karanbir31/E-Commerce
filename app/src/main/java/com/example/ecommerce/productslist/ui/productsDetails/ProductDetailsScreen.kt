@@ -14,6 +14,8 @@ fun ProductDetailsScreen(productId: Long) {
         modifier = Modifier.fillMaxSize()
             .background(Color.Red)
     ) {
+
+
         Text("Product Id - $productId")
     }
 }
