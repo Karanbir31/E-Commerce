@@ -9,10 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -27,13 +24,35 @@ import coil3.compose.AsyncImage
 import com.example.ecommerce.R
 import com.example.ecommerce.userDetails.domain.modules.UserDetails
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
+
 @Composable
 fun UserDetailsScreen(
     navController: NavController,
     userDetailsViewModel: UserDetailsViewModel = hiltViewModel()
 ) {
-
-
     val context = LocalContext.current
     val userDetailsUiState = userDetailsViewModel.userDetails.collectAsState().value
 
@@ -47,106 +66,189 @@ fun UserDetailsScreen(
         }
 
         is UserDetailsUiState.Success -> {
-            UserDetailsUi(userDetailsUiState.data)
+            UsersProfileUi(userDetailsUiState.data)
         }
     }
 }
 
-@Composable
-fun UserDetailsUi(userDetails: UserDetails) {
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserSProfileAppBar() {
+    TopAppBar(
+        title = {
+            Text(
+                text = "Profile",
+                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        },
+        navigationIcon = {
+            Icon(Icons.AutoMirrored.Filled.ArrowBack, "backs")
+        },
+        colors = TopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    )
+}
+
+
+@Composable
+fun UsersProfileUi(userDetails : UserDetails) {
     LazyColumn {
-
-        //header image and full name
         item {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                AsyncImage(
-                    model = userDetails.image,
-                    contentDescription = "user image",
-                    placeholder = painterResource(R.drawable.ic_launcher_background)
-                )
-
-                Spacer(Modifier.height(24.dp))
-
-                Text(
-                    text = "${userDetails.firstName} ${userDetails.lastName}",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
+            UsersImages(
+                name = userDetails.username,
+                email = userDetails.email
+            )
         }
 
-        // Spacer
         item {
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height((16.dp)))
         }
 
-        //basic information
         item {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-            ) {
-                Text(
-                    text = "User details",
-                    style = MaterialTheme.typography.titleMedium
-                )
-
-                HorizontalDivider()
-
-                UserDetailsRow(
-                    label = "Email",
-                    value = userDetails.email
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                UserDetailsRow(
-                    label = "Gender",
-                    value = userDetails.gender
-                )
-
-                Spacer(Modifier.height(16.dp))
-
-                OutlinedButton(
-                    onClick = {
-                        // delete refreshToken and accessToken from sharedPerf
-                        // navigate to authentication screen
-                        TODO()
-
-                    }
-                ){
-                    Text(
-                        text = "Sign out"
-                    )
-                }
-
-            }
+            UsersProfileElementsRow(
+                icon = R.drawable.ic_profile,
+                rowText = "Personal Details"
+            ) { }
         }
+
+        item {
+            UsersProfileElementsRow(
+                icon = R.drawable.outline_orders_24,
+                rowText = "Orders"
+            ) { }
+        }
+
+        item {
+            UsersProfileElementsRow(
+                icon = R.drawable.outline_heart_check_24,
+                rowText = "Wishlist"
+            ) { }
+        }
+
+        item {
+            UsersProfileElementsRow(
+                icon = R.drawable.outline_headset_mic_24,
+                rowText = "Help Center"
+            ) { }
+        }
+
+
+        item {
+            UsersProfileElementsRow(
+                icon = R.drawable.outline_logout_24,
+                rowText = "Log out"
+            ) { }
+        }
+
 
     }
+}
+
+@Composable
+fun UsersImages(
+    name : String,
+    email : String,
+    imageUrl: String = "https://dummyjson.com/icon/liamg/128",
+    modifier: Modifier = Modifier
+) {
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(Color.Transparent),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        Card(
+            modifier = modifier
+                .size(120.dp) // Fixed size for profile circle
+                .aspectRatio(1f)
+                .padding(8.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+            shape = CircleShape,
+            border = BorderStroke(
+                2.dp,
+                Brush.radialGradient(colors = listOf(Color.Gray, Color.Gray))
+            )
+        ) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = "User image",
+                placeholder = painterResource(R.drawable.ic_launcher_background),
+                contentScale = ContentScale.Crop, // Makes image fill the circle
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(2.dp) // Ensure image fits card
+            )
+        }
+
+        Text(
+            text = "Hello, Karanbir",
+            color = Color.Black,
+            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp),
+            maxLines = 1,
+            modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
+        )
+        Text(
+            text = "Karan0031singh@gmail.com",
+            color = Color.Black,
+            style = TextStyle(fontWeight = FontWeight.Normal, fontSize = 16.sp),
+            maxLines = 1,
+            modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
+        )
+
+    }
+
 
 }
 
 @Composable
-fun UserDetailsRow(
-    label: String,
-    value: String
-) {
+fun UsersProfileElementsRow(icon: Int, rowText: String, onClick: () -> Unit) {
     Row(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 12.dp, start = 16.dp, end = 16.dp)
+            .clickable {
+                onClick.invoke()
+            }
+        ,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = label,
-            modifier = Modifier.weight(1f)
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = rowText,
+            modifier = Modifier
+                .size(36.dp)
+                .padding(end = 8.dp)
         )
+
         Text(
-            text = value,
-            modifier = Modifier.weight(1f)
+            text = rowText,
+            color = Color.Black,
+            style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp),
+            maxLines = 1,
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 8.dp, horizontal = 16.dp)
         )
+
+        Icon(
+            painter = painterResource(R.drawable.outline_arrow_forward_ios_24),
+            tint = MaterialTheme.colorScheme.onSurface,
+            contentDescription = "show more",
+            modifier = Modifier.size(24.dp)
+
+        )
+
     }
 }
