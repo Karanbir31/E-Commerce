@@ -70,12 +70,13 @@ class ProductsListRepositoryImp @Inject constructor(
     override suspend fun getProductsByCategories(
         category: String,
         pageNumber: Int,
+        limit : Int ,
         sortBy: String,
         sortingOrder: String
     ): ProductsResponse {
         val response = productsApi.getProductsByCategories(
             category = category,
-            limit = 15,
+            limit = limit,
             skip = (pageNumber - 1) * 15,
             sortBy = sortBy,
             sortingOrder = sortingOrder

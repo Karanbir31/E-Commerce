@@ -28,7 +28,7 @@ fun AppNavigationGraph(navController: NavHostController, modifier: Modifier = Mo
             UserDetailsScreen(navController = navController)
         }
         composable(NavScreens.Cart.route) {
-            CartsDetailsScreen()
+            CartsDetailsScreen(navController = navController)
         }
         composable(NavScreens.Authentication.route) {
             AuthenticationScreen(navController = navController)

@@ -11,6 +11,7 @@ class GetProductsByCategoriesUseCase @Inject constructor(
     suspend operator fun invoke(
         category: String,
         pageNumber: Int = 1,
+        limit : Int = 25,
         sortBy: String = "title",
         sortingOrder: String = "asc"
     ): ProductsResponse {
@@ -18,6 +19,7 @@ class GetProductsByCategoriesUseCase @Inject constructor(
         return repository.getProductsByCategories(
             category = category,
             pageNumber = pageNumber,
+            limit = limit ,
             sortBy = sortBy,
             sortingOrder = sortingOrder
         )

@@ -23,6 +23,7 @@ interface ProductsListRepository {
     suspend fun getProductsByCategories(
         category: String,
         pageNumber: Int = 1,
+        limit : Int = 25,
         sortBy: String = "title",
         sortingOrder: String = "asc"
     ): ProductsResponse
