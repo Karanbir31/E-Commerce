@@ -38,7 +38,7 @@ fun AppNavigationGraph(navController: NavHostController, modifier: Modifier = Mo
             arguments = listOf(navArgument("productId") { type = NavType.LongType })
         ) {backStackEntry->
             val productId = backStackEntry.arguments?.getLong("productId") ?: 1L
-            ProductDetailsScreen(productId = productId)
+            ProductDetailsScreen(productId = productId, navController = navController)
         }
     }
 }

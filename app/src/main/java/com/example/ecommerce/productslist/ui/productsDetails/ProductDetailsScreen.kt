@@ -49,8 +49,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.ecommerce.R
+import com.example.ecommerce.navigation.NavScreens
 import com.example.ecommerce.productslist.domain.modules.Product
 import com.example.ecommerce.productslist.ui.ProductActionButton
 import com.example.ecommerce.productslist.ui.ProductsUiState
@@ -60,6 +62,7 @@ import kotlin.math.absoluteValue
 @Composable
 fun ProductDetailsScreen(
     productId: Long,
+    navController: NavController,
     viewModel: ProductDetailsViewModel = hiltViewModel()
 ) {
     LaunchedEffect(productId) {
@@ -74,34 +77,34 @@ fun ProductDetailsScreen(
         is ProductDetailsUiState.Error -> {
 
         }
-
         ProductDetailsUiState.Loading -> {
 
         }
-
         is ProductDetailsUiState.Success -> {
 
             LaunchedEffect(productState.data.category) {
                 viewModel.searchProductsByCategory(productState.data.category, 1)
             }
-            ProductDetailsScreenUi(productState.data, similarProductsUiState )
+            ProductDetailsScreenUi(productState.data, similarProductsUiState ){
+                navController.navigate(it){
+                    navController.popBackStack()
+                    launchSingleTop = true
+                }
+            }
 
         }
     }
-
-
 }
 
 
 @Composable
-fun ProductDetailsScreenUi(product: Product, similarProductsUiState: StateFlow<ProductsUiState>) {
+fun ProductDetailsScreenUi(product: Product, similarProductsUiState: StateFlow<ProductsUiState>, onClickNavigate : (String) -> Unit) {
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
-        topBar = {
-            ProductsDetailsAppBar()
-        },
+       // modifier = Modifier.systemBarsPadding(),
         bottomBar = {
-            BuyAndCartsButtons()
+            BuyAndCartsButtons{
+                onClickNavigate.invoke(it)
+            }
         }
     ) {
         LazyColumn(modifier = Modifier.padding(it)) {
@@ -204,9 +207,11 @@ fun MoreSimilarProducts(similarProductsUiState: StateFlow<ProductsUiState>) {
 
 
 @Composable
-fun BuyAndCartsButtons() {
+fun BuyAndCartsButtons(
+   onClickNavigate : (String) -> Unit
+) {
     Row(
-        modifier = Modifier.padding(vertical = 12.dp, horizontal = 16.dp),
+        modifier = Modifier.padding(vertical = 4.dp, horizontal = 16.dp),
         horizontalArrangement = Arrangement.Absolute.SpaceBetween
     ) {
 
@@ -214,12 +219,17 @@ fun BuyAndCartsButtons() {
             text = "Add to cart",
             buttonIcon = R.drawable.ic_cart,
             modifier = Modifier.weight(1f)
-        ) { }
+        ) {
+            onClickNavigate.invoke(NavScreens.Cart.route)
+        }
         ProductActionButton(
             text = "Buy now",
             buttonIcon = R.drawable.ic_buy,
             modifier = Modifier.weight(1f)
-        ) { }
+        ) {
+
+            onClickNavigate.invoke(NavScreens.Cart.route)
+        }
 
     }
 

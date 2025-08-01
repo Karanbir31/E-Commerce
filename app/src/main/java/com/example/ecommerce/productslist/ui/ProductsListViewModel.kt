@@ -20,6 +20,7 @@ sealed class ProductsUiState() {
     object Loading : ProductsUiState()
     class Error(val exception: Exception) : ProductsUiState()
     class Success(val data: ProductsResponse) : ProductsUiState()
+   // class SearchQuery(val query : String) : ProductsUiState()
 }
 
 
@@ -93,5 +94,10 @@ class ProductsListViewModel @Inject constructor(
             }
         }
     }
+
+
+//    fun onSearchQueryChange(updatedQuery : String){
+//        _productsUiState.value = ProductsUiState.SearchQuery(updatedQuery)
+//    }
 
 }

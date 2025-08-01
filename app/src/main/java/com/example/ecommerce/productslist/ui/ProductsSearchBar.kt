@@ -35,7 +35,7 @@ fun ProductsSearchBar(
     onQueryChange: (String) -> Unit,
     onSearchQuery: (String) -> Unit,
     isActive: Boolean,
-    onActiveChange: (Boolean) -> Unit,
+  //  onActiveChange: (Boolean) -> Unit,
     productsCategories: List<String>
 ) {
     Box(

@@ -4,11 +4,10 @@ import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import com.example.ecommerce.R
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,8 +15,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -27,20 +24,18 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,10 +44,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import coil3.compose.AsyncImage
+import com.example.ecommerce.R
 import com.example.ecommerce.navigation.NavScreens
 import com.example.ecommerce.productslist.domain.modules.Product
 import kotlinx.coroutines.delay
+
+import java.math.BigDecimal
+import java.math.RoundingMode
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,101 +90,83 @@ fun ProductsScreen(
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-
-        topBar = {
-            if (!isSearchBarActive) {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Title",
-                            modifier = Modifier.padding(start = 16.dp)
-                        )
-                    },
-                    actions = {
-                        Icon(
-                            Icons.Default.Search,
-                            "search",
-                            modifier = Modifier
-                                .padding(start = 8.dp, end = 16.dp)
-                                .clickable(
-                                    onClick = {
-                                        isSearchBarActive = true
-                                    }
-                                )
-
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(elevation = 8.dp)
-                )
-            } else {
-                ProductsSearchBar(
-                    query = query,
-                    onQueryChange = {
-                        query = it
-                    },
-                    onSearchQuery = {
-                        searchedQuery = it
-                        isSearchBarActive = false
-                    },
-                    isActive = isSearchBarActive,
-                    onActiveChange = {
-                        isSearchBarActive = it
-                    },
-                    productsCategories = productsCategories
-                )
-            }
+    when (val state = productsUiState) {
+        is ProductsUiState.Error -> {
+            Log.d("tag", "Ui state is error and errorCode - ${state.exception}")
         }
 
-    ) { innerPadding ->
-        when (val state = productsUiState) {
-            is ProductsUiState.Error -> {
-                Log.d("tag", "Ui state is error and errorCode - ${state.exception}")
-            }
-            ProductsUiState.Loading -> {
-                Log.d("tag", "Ui state is loading")
-            }
-            is ProductsUiState.Success -> {
+        ProductsUiState.Loading -> {
+            Log.d("tag", "Ui state is loading")
+        }
+
+        is ProductsUiState.Success -> {
+            Column {
+
+                Box(
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            isSearchBarActive = !isSearchBarActive
+                        }
+                    )
+                ){
+                    ProductsSearchBar(
+                        query = query,
+                        onSearchQuery = {
+                            searchedQuery = it
+                            isSearchBarActive = !isSearchBarActive
+                        },
+                        onQueryChange = {
+                            query = it
+                        },
+                        isActive = isSearchBarActive,
+                        productsCategories = productsCategories
+
+                    )
+                }
+
+
+                Spacer(Modifier.height(8.dp))
+
+                FilterAndSortingRow()
+
                 ProductsList(
                     products = state.data.products,
                     navController = navController,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = innerPadding.calculateTopPadding())
                 )
+
             }
+
+
         }
     }
+
 }
 
 @Composable
 fun ProductsList(
     products: List<Product>,
     navController: NavController,
-    modifier: Modifier = Modifier
-) {
+
+    ) {
 //    val context = LocalContext.current
-    LazyColumn(modifier = modifier) {
-
-        item {
-            FilterAndSortingRow()
-        }
-
+    LazyColumn {
         items(products) { product ->
             ProductItem(
                 product = product,
                 onClickProduct = {
-                    navController.navigate(
-                        NavScreens.ProductDetails.createRoute(productId = product.id)
-                    )
+
+                    navController.navigate(route = NavScreens.ProductDetails.createRoute(product.id)) {
+                        launchSingleTop = true
+                        restoreState = true
+                        popUpTo(navController.graph.findStartDestination().id) {
+                            saveState = true
+                        }
+                    }
                 },
                 onClickNavigateToCart = {
                     navController.navigate(
                         NavScreens.Cart.route
-                    ){
+                    ) {
                         launchSingleTop = true
                     }
                 }
@@ -191,7 +174,7 @@ fun ProductsList(
         }
 
         item {
-            Spacer(modifier.height(200.dp))
+            Spacer(Modifier.height(200.dp))
         }
     }
 }
@@ -273,8 +256,8 @@ fun FilterAndSortingRow() {
 @Composable
 fun ProductItem(
     product: Product,
-    onClickProduct : () -> Unit,
-    onClickNavigateToCart : () -> Unit
+    onClickProduct: () -> Unit,
+    onClickNavigateToCart: () -> Unit
 ) {
     var shouldShowAddToCart by remember { mutableStateOf(true) }
 
@@ -292,6 +275,7 @@ fun ProductItem(
     ) {
         Row {
             ProductImage(
+                imageUrl = product.thumbnail,
                 modifier = Modifier
                     .weight(1f)
                     .background(shape = RoundedCornerShape(8.dp), color = Color.Transparent)
@@ -299,7 +283,7 @@ fun ProductItem(
 
             Column(
                 modifier = Modifier
-                    .weight(1.25f)
+                    .weight(1.5f)
                     .background(shape = RoundedCornerShape(8.dp), color = Color.Transparent)
             ) {
 
@@ -316,7 +300,7 @@ fun ProductItem(
                         modifier = Modifier
                     ) {
                         //add to cart clicked
-                        TODO("Add product into room database")
+                        //  TODO("Add product into room database")
                         shouldShowAddToCart = false
                     }
                 } else {
@@ -359,9 +343,12 @@ fun ProductsRatingRow(rating: Float) {
 }
 
 @Composable
-fun ProductsPriceRow(price : Float, discountPercentage: Float) {
+fun ProductsPriceRow(price: Float, discountPercentage: Float) {
     val costPrice = (price * 100) / (100 - discountPercentage)
-    Row {
+
+    val decimal = BigDecimal(3.14159265359).setScale(2, RoundingMode.HALF_EVEN)
+
+    Column {
         Text(
             text = price.toString(),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
@@ -371,41 +358,48 @@ fun ProductsPriceRow(price : Float, discountPercentage: Float) {
             modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
         )
 
-        Text(
-            text = costPrice.toString(),
-            style = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.LineThrough),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
-        )
-        Text(
-            text = "$discountPercentage % off",
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Start,
-            modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
-        )
+        Row {
+
+            Text(
+                text = costPrice.toString(),
+                style = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.LineThrough),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
+            )
+            Text(
+                text = "$discountPercentage % off",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                textAlign = TextAlign.Start,
+                modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
+            )
+        }
+
     }
+
+
 }
 
 @Composable
-fun ProductImage(modifier: Modifier = Modifier) {
+fun ProductImage(imageUrl: String, modifier: Modifier = Modifier) {
     AsyncImage(
-        model = "https://cdn.dummyjson.com/product-images/fragrances/dolce-shine-eau-de/3.webp",
+        model = imageUrl,
         contentDescription = "product",
+        contentScale = ContentScale.FillWidth,
         placeholder = painterResource(R.drawable.ic_launcher_background),
         modifier = modifier
     )
 }
 
 @Composable
-fun ProductTitleAndDescription(title : String, description : String) {
+fun ProductTitleAndDescription(title: String, description: String) {
     Text(
         text = title,
-        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
+        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Start,
@@ -418,7 +412,7 @@ fun ProductTitleAndDescription(title : String, description : String) {
 
     Text(
         text = description,
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.titleMedium,
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Start,
@@ -448,7 +442,7 @@ fun ProductActionButton(
         onClick = onClick,
         modifier = modifier.padding(8.dp),
     ) {
-        if (buttonIcon != null){
+        if (buttonIcon != null) {
             Icon(
                 painter = painterResource(buttonIcon),
                 contentDescription = "buy now",
@@ -467,6 +461,7 @@ fun ProductActionButton(
         )
     }
 }
+
 
 @Composable
 fun ProductQuantitySelector(
@@ -512,3 +507,49 @@ fun ProductQuantitySelector(
     }
 }
 
+
+//  topBar = {
+//            if (!isSearchBarActive) {
+//                TopAppBar(
+//                    title = {
+//                        Text(
+//                            text = "Title",
+//                            modifier = Modifier.padding(start = 16.dp)
+//                        )
+//                    },
+//                    actions = {
+//                        Icon(
+//                            Icons.Default.Search,
+//                            "search",
+//                            modifier = Modifier
+//                                .padding(start = 8.dp, end = 16.dp)
+//                                .clickable(
+//                                    onClick = {
+//                                        isSearchBarActive = true
+//                                    }
+//                                )
+//
+//                        )
+//                    },
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .shadow(elevation = 8.dp)
+//                )
+//            } else {
+//                ProductsSearchBar(
+//                    query = query,
+//                    onQueryChange = {
+//                        query = it
+//                    },
+//                    onSearchQuery = {
+//                        searchedQuery = it
+//                        isSearchBarActive = false
+//                    },
+//                    isActive = isSearchBarActive,
+//                    onActiveChange = {
+//                        isSearchBarActive = it
+//                    },
+//                    productsCategories = productsCategories
+//                )
+//            }
+//        }
