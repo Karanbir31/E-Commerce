@@ -76,6 +76,7 @@ class AuthRepositoryImp @Inject constructor(
     // save refresh token into shared preference for further login request
     private fun saveRefreshToken(token: String) {
         try {
+            Log.d(TAG, "saveRefreshToken: $token  end")
             sharedPref.edit {
                 putString(SharedPrefKeys.REFRESH_TOKEN, token)
             }

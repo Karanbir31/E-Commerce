@@ -173,8 +173,12 @@ fun MoreSimilarProducts(similarProductsUiState: StateFlow<ProductsUiState>) {
     val similarProducts = similarProductsUiState.collectAsState().value
 
     when(similarProducts){
-        is ProductsUiState.Error -> TODO()
-        ProductsUiState.Loading -> TODO()
+        is ProductsUiState.Error -> {
+
+        }
+        ProductsUiState.Loading -> {
+
+        }
         is ProductsUiState.Success -> {
             Column {
                 Text(
@@ -196,10 +200,6 @@ fun MoreSimilarProducts(similarProductsUiState: StateFlow<ProductsUiState>) {
             }
         }
     }
-
-
-
-
 }
 
 

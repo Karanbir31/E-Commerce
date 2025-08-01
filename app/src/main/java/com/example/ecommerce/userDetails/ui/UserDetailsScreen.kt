@@ -1,5 +1,6 @@
 package com.example.ecommerce.userDetails.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,7 +24,6 @@ import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import com.example.ecommerce.R
 import com.example.ecommerce.userDetails.domain.modules.UserDetails
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,12 +40,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarColors
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import com.example.ecommerce.navigation.NavScreens
 
 
 @Composable
@@ -55,6 +57,15 @@ fun UserDetailsScreen(
 ) {
     val context = LocalContext.current
     val userDetailsUiState = userDetailsViewModel.userDetails.collectAsState().value
+
+    LaunchedEffect(Unit) {
+        userDetailsViewModel.navigateAuthScreen.collect {
+            Log.d("TAG", "UserDetailsScreen: navigateAuthScreen")
+            navController.navigate(NavScreens.Authentication.route){
+                launchSingleTop = true
+            }
+        }
+    }
 
     when (userDetailsUiState) {
         is UserDetailsUiState.Loading -> {
@@ -74,7 +85,7 @@ fun UserDetailsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserSProfileAppBar() {
+fun UserProfileAppBar() {
     TopAppBar(
         title = {
             Text(
@@ -192,23 +203,20 @@ fun UsersImages(
         }
 
         Text(
-            text = "Hello, Karanbir",
+            text = "Hello, $name",
             color = Color.Black,
             style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp),
             maxLines = 1,
             modifier = Modifier.padding(top = 8.dp, start = 8.dp, end = 8.dp)
         )
         Text(
-            text = "Karan0031singh@gmail.com",
+            text = email,
             color = Color.Black,
             style = TextStyle(fontWeight = FontWeight.Normal, fontSize = 16.sp),
             maxLines = 1,
             modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
         )
-
     }
-
-
 }
 
 @Composable

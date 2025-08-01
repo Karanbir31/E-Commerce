@@ -188,9 +188,14 @@ fun CartProductItem(product: Product, onClickProduct: (Long) -> Unit) {
         Box {
             ProductItem(
                 product = product,
+
                 onClickProduct = {
                     onClickProduct.invoke(product.id)
-                })
+                },
+                onClickNavigateToCart = {
+
+                },
+                )
 
             Checkbox(
                 checked = true,

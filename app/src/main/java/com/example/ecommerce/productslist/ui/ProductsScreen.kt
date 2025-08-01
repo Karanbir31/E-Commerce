@@ -1,9 +1,7 @@
 package com.example.ecommerce.productslist.ui
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,10 +39,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -169,7 +165,7 @@ fun ProductsList(
     navController: NavController,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
+//    val context = LocalContext.current
     LazyColumn(modifier = modifier) {
 
         item {
@@ -183,6 +179,13 @@ fun ProductsList(
                     navController.navigate(
                         NavScreens.ProductDetails.createRoute(productId = product.id)
                     )
+                },
+                onClickNavigateToCart = {
+                    navController.navigate(
+                        NavScreens.Cart.route
+                    ){
+                        launchSingleTop = true
+                    }
                 }
             )
         }
@@ -270,7 +273,8 @@ fun FilterAndSortingRow() {
 @Composable
 fun ProductItem(
     product: Product,
-    onClickProduct : () -> Unit
+    onClickProduct : () -> Unit,
+    onClickNavigateToCart : () -> Unit
 ) {
     var shouldShowAddToCart by remember { mutableStateOf(true) }
 
@@ -283,7 +287,7 @@ fun ProductItem(
             .fillMaxWidth()
             .padding(top = 8.dp, start = 8.dp, end = 8.dp)
             .clickable {
-
+                onClickProduct.invoke()
             }
     ) {
         Row {
@@ -299,11 +303,11 @@ fun ProductItem(
                     .background(shape = RoundedCornerShape(8.dp), color = Color.Transparent)
             ) {
 
-                ProductTitleAndDescription()
+                ProductTitleAndDescription(title = product.title, description = product.description)
 
-                ProductsPriceRow()
+                ProductsPriceRow(product.price, product.discountPercentage)
 
-                ProductsRatingRow()
+                ProductsRatingRow(product.rating)
 
                 if (shouldShowAddToCart) {
                     ProductActionButton(
@@ -312,21 +316,20 @@ fun ProductItem(
                         modifier = Modifier
                     ) {
                         //add to cart clicked
+                        TODO("Add product into room database")
                         shouldShowAddToCart = false
-
                     }
                 } else {
-                    ProductQuantitySelector(
-                        onRemoveProduct = {
+                    ProductActionButton(
+                        text = "Go to cart",
+                        buttonIcon = R.drawable.ic_cart,
+                        modifier = Modifier
+                    ) {
+                        //navigate to carts screen
+                        onClickNavigateToCart.invoke()
 
-                        },
-                        onAddProduct = {
-
-                        }
-                    )
+                    }
                 }
-
-
             }
         }
 
@@ -334,34 +337,33 @@ fun ProductItem(
 }
 
 @Composable
-fun ProductsRatingRow() {
+fun ProductsRatingRow(rating: Float) {
     Row(
         modifier = Modifier.padding(4.dp)
     ) {
         Text(
-            text = "4.7",
+            text = rating.toString(),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             maxLines = 1,
             textAlign = TextAlign.Start,
             modifier = Modifier.padding(start = 8.dp, end = 8.dp)
         )
 
-        for (i in 1..5) {
-            Icon(
-                painter = painterResource(R.drawable.star_button_selected),
-                contentDescription = "rating",
-                tint = MaterialTheme.colorScheme.error.copy(alpha = 0.75f),
-                modifier = Modifier.size(20.dp)
-            )
-        }
+        for (i in 1..5) Icon(
+            painter = painterResource(R.drawable.star_button_selected),
+            contentDescription = "rating",
+            tint = MaterialTheme.colorScheme.error.copy(alpha = 0.75f),
+            modifier = Modifier.size(20.dp)
+        )
     }
 }
 
 @Composable
-fun ProductsPriceRow() {
+fun ProductsPriceRow(price : Float, discountPercentage: Float) {
+    val costPrice = (price * 100) / (100 - discountPercentage)
     Row {
         Text(
-            text = "$499",
+            text = price.toString(),
             style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -370,7 +372,7 @@ fun ProductsPriceRow() {
         )
 
         Text(
-            text = "$799",
+            text = costPrice.toString(),
             style = MaterialTheme.typography.bodyLarge.copy(textDecoration = TextDecoration.LineThrough),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
@@ -378,7 +380,7 @@ fun ProductsPriceRow() {
             modifier = Modifier.padding(top = 4.dp, start = 8.dp, end = 8.dp)
         )
         Text(
-            text = "30% off",
+            text = "$discountPercentage % off",
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
             maxLines = 1,
@@ -400,9 +402,9 @@ fun ProductImage(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ProductTitleAndDescription() {
+fun ProductTitleAndDescription(title : String, description : String) {
     Text(
-        text = "Black Winter Jacket",
+        text = title,
         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
@@ -415,7 +417,7 @@ fun ProductTitleAndDescription() {
     )
 
     Text(
-        text = "Autumn and winter casual cotton padded jacket",
+        text = description,
         style = MaterialTheme.typography.bodyMedium,
         maxLines = 2,
         overflow = TextOverflow.Ellipsis,
@@ -432,8 +434,8 @@ fun ProductTitleAndDescription() {
 @Composable
 fun ProductActionButton(
     text: String = "Buy Now",
-    buttonIcon: Int?,
     modifier: Modifier = Modifier,
+    buttonIcon: Int?,
     onClick: () -> Unit
 ) {
     ElevatedButton(
