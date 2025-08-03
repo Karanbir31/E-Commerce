@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -102,27 +103,23 @@ fun ProductsScreen(
         is ProductsUiState.Success -> {
             Column {
 
-                Box(
-                    modifier = Modifier.clickable(
-                        onClick = {
-                            isSearchBarActive = !isSearchBarActive
-                        }
-                    )
-                ){
-                    ProductsSearchBar(
-                        query = query,
-                        onSearchQuery = {
-                            searchedQuery = it
-                            isSearchBarActive = !isSearchBarActive
-                        },
-                        onQueryChange = {
-                            query = it
-                        },
-                        isActive = isSearchBarActive,
-                        productsCategories = productsCategories
+                ProductsSearchBar(
+                    query = query,
+                    onSearchQuery = {
+                        query = it
+                        searchedQuery = it
+                        isSearchBarActive = !isSearchBarActive
+                    },
+                    onQueryChange = {
+                        query = it
+                    },
+                    isActive = isSearchBarActive,
+                    onActiveChange = {
+                        isSearchBarActive = it;
+                    },
+                    productsCategories = productsCategories
 
-                    )
-                }
+                )
 
 
                 Spacer(Modifier.height(8.dp))
@@ -507,6 +504,14 @@ fun ProductQuantitySelector(
     }
 }
 
+
+@Composable
+fun StaticSearchDisplay(modifier: Modifier = Modifier) {
+    Text(
+        "Search ... ",
+
+    )
+}
 
 //  topBar = {
 //            if (!isSearchBarActive) {

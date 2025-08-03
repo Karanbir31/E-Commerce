@@ -43,7 +43,6 @@ class MainActivity : ComponentActivity() {
 
             val showBottomBar = currentDestination?.route in BottomNavItems.bottomNavRoutes
 
-
             ECommerceTheme {
 
                 Scaffold(

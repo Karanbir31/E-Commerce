@@ -83,10 +83,6 @@ fun UserCartsDetailsUi(data: Cart, onClickProduct: (Long) -> Unit) {
     val cartItem = CartItem()
 
     Scaffold(
-        modifier = Modifier.systemBarsPadding(),
-        topBar = {
-            ProductsCartAppBar()
-        },
         bottomBar = {
             CheckOutBottomBar()
         }
